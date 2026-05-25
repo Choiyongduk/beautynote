@@ -1,0 +1,44 @@
+name: Scrape Notices
+
+on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install scraper dependencies
+        run: cd scraper && npm install
+
+      - name: Run scraper
+        run: cd scraper && npm run scrape
+        env:
+          BIZINFO_API_KEY: ${{ secrets.BIZINFO_API_KEY }}
+          BIZINFO_EVENT_API_KEY: ${{ secrets.BIZINFO_EVENT_API_KEY }}
+          DATAGO_API_KEY: ${{ secrets.DATAGO_API_KEY }}
+
+      - name: Commit and push notice updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain public/notices.json)" ]; then
+            git add public/notices.json
+            git commit -m "자동 스크래퍼: public/notices.json 업데이트"
+            git push
+          else
+            echo "No changes in public/notices.json"
+          fi

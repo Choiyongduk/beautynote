@@ -19,6 +19,14 @@ function daysUntil(dateStr) {
   return diff;
 }
 
+function isNoticeExpired(endDate) {
+  if (!endDate) return false; // 상시 공고는 만료되지 않음
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadline = new Date(endDate);
+  return deadline < today; // 오늘보다 이전이면 만료됨
+}
+
 function DeadlineBadge({ deadline }) {
   if (!deadline) {
     return (
@@ -230,6 +238,7 @@ export default function App() {
   const [search, setSearch] = useState('');
   const [bookmarks, setBookmarks] = useState(new Set());
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
+  const [showClosedNotices, setShowClosedNotices] = useState(false);
   const [detail, setDetail] = useState(null);
 
   useEffect(() => {
@@ -256,6 +265,16 @@ export default function App() {
 
   const filtered = useMemo(() => {
     let list = [...notices];
+    
+    // 마감 공고 필터링
+    if (!showClosedNotices) {
+      // 진행중인 공고만 표시 (마감되지 않은 공고)
+      list = list.filter(n => !isNoticeExpired(n.endDate));
+    } else {
+      // 마감된 공고만 표시
+      list = list.filter(n => isNoticeExpired(n.endDate));
+    }
+    
     if (category !== '전체') list = list.filter(n => n.category === category);
     if (showBookmarksOnly) list = list.filter(n => bookmarks.has(n.sourceId));
     if (search.trim()) {
@@ -274,12 +293,16 @@ export default function App() {
     else if (sort === 'relevance') list.sort((a, b) => b.relevance - a.relevance);
     else if (sort === 'posted') list.sort((a, b) => (b.posted || '').localeCompare(a.posted || ''));
     return list;
-  }, [notices, category, sort, search, showBookmarksOnly, bookmarks]);
+  }, [notices, category, sort, search, showBookmarksOnly, showClosedNotices, bookmarks]);
 
   const urgentCount = notices.filter(n => {
     const d = daysUntil(n.endDate);
     return d >= 0 && d <= 7;
   }).length;
+
+  const closedCount = notices.filter(n => isNoticeExpired(n.endDate)).length;
+  const activeNoticesCount = notices.filter(n => !isNoticeExpired(n.endDate)).length;
+  const activeDaejeonCount = notices.filter(n => !isNoticeExpired(n.endDate) && n.region === '대전').length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-stone-50/50 to-white">
@@ -309,7 +332,7 @@ export default function App() {
                 </h1>
               </div>
               <p className="text-[11.5px] text-stone-500 ml-9">
-                매일 자동 업데이트 · {notices.length}건 수집
+                매일 자동 업데이트 · {activeNoticesCount}건 진행중
               </p>
             </div>
             <button className="relative p-2 rounded-xl hover:bg-stone-50 transition-colors">
@@ -348,16 +371,29 @@ export default function App() {
             ))}
             <div className="w-px bg-stone-200 mx-1" />
             <button
-              onClick={() => setShowBookmarksOnly(v => !v)}
+              onClick={() => setShowClosedNotices(v => !v)}
               className={`flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[12.5px] font-medium transition-all ${
-                showBookmarksOnly
-                  ? 'bg-rose-500 text-white'
+                showClosedNotices
+                  ? 'bg-stone-500 text-white'
                   : 'bg-white border border-stone-200 text-stone-600'
               }`}
             >
-              <Bookmark size={12} fill={showBookmarksOnly ? 'currentColor' : 'none'} strokeWidth={2.2} />
-              저장
+              <Clock size={12} strokeWidth={2} />
+              {showClosedNotices ? `마감 ${closedCount}` : '마감'}
             </button>
+            {!showClosedNotices && (
+              <button
+                onClick={() => setShowBookmarksOnly(v => !v)}
+                className={`flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[12.5px] font-medium transition-all ${
+                  showBookmarksOnly
+                    ? 'bg-rose-500 text-white'
+                    : 'bg-white border border-stone-200 text-stone-600'
+                }`}
+              >
+                <Bookmark size={12} fill={showBookmarksOnly ? 'currentColor' : 'none'} strokeWidth={2.2} />
+                저장
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -369,7 +405,7 @@ export default function App() {
           <div className="relative">
             <p className="text-[11px] text-stone-400 mb-1 tracking-wider uppercase">Today</p>
             <p className="font-serif text-2xl mb-3 tracking-tight">
-              {loading ? '로딩 중...' : `${notices.length}건의 공고가 진행중이에요`}
+              {loading ? '로딩 중...' : `${activeNoticesCount}건의 공고가 진행중이에요`}
             </p>
             <div className="flex gap-4 text-[12px]">
               <div className="flex items-center gap-1.5">
@@ -379,7 +415,7 @@ export default function App() {
               <div className="flex items-center gap-1.5">
                 <TrendingUp size={11} className="text-rose-300" strokeWidth={2.5} />
                 <span className="text-stone-300">
-                  대전 {notices.filter(n => n.region === '대전').length}건
+                  대전 {activeDaejeonCount}건
                 </span>
               </div>
             </div>

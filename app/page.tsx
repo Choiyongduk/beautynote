@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Bell, Bookmark, BookmarkCheck, MapPin, Building2, Sparkles, ExternalLink, Clock, TrendingUp, X } from 'lucide-react';
 
 const CATEGORIES = ['전체', '지원사업', '전시·박람회', '교육·세미나'];
+const REGIONS = ['전국', '서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
 const SORT_OPTIONS = [
   { key: 'deadline', label: '마감임박순' },
   { key: 'relevance', label: '관련도순' },
@@ -234,6 +235,7 @@ export default function App() {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('전체');
+  const [selectedRegions, setSelectedRegions] = useState(['대전', '전국']);
   const [sort, setSort] = useState('deadline');
   const [search, setSearch] = useState('');
   const [bookmarks, setBookmarks] = useState(new Set());
@@ -276,6 +278,9 @@ export default function App() {
     }
     
     if (category !== '전체') list = list.filter(n => n.category === category);
+    if (selectedRegions.length > 0) {
+      list = list.filter(n => selectedRegions.includes(n.region || '전국'));
+    }
     if (showBookmarksOnly) list = list.filter(n => bookmarks.has(n.sourceId));
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -293,7 +298,7 @@ export default function App() {
     else if (sort === 'relevance') list.sort((a, b) => b.relevance - a.relevance);
     else if (sort === 'posted') list.sort((a, b) => (b.posted || '').localeCompare(a.posted || ''));
     return list;
-  }, [notices, category, sort, search, showBookmarksOnly, showClosedNotices, bookmarks]);
+  }, [notices, category, selectedRegions, sort, search, showBookmarksOnly, showClosedNotices, bookmarks]);
 
   const urgentCount = notices.filter(n => {
     const d = daysUntil(n.endDate);
@@ -395,6 +400,35 @@ export default function App() {
               </button>
             )}
           </div>
+
+          <div className="mt-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2">
+            <div className="flex gap-2 min-w-max">
+              {REGIONS.map(region => {
+                const isSelected = selectedRegions.includes(region);
+                return (
+                  <button
+                    key={region}
+                    type="button"
+                    onClick={() => {
+                      setSelectedRegions(prev => {
+                        if (prev.includes(region)) {
+                          return prev.filter(r => r !== region);
+                        }
+                        return [...prev, region];
+                      });
+                    }}
+                    className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-[12.5px] font-medium transition-all whitespace-nowrap ${
+                      isSelected
+                        ? 'bg-rose-500 text-white border border-rose-500'
+                        : 'bg-white border border-stone-200 text-stone-600 hover:border-stone-300'
+                    }`}
+                  >
+                    {region}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </header>
 
@@ -407,10 +441,14 @@ export default function App() {
             <p className="font-serif text-2xl mb-3 tracking-tight">
               {loading ? '로딩 중...' : `${activeNoticesCount}건의 공고가 진행중이에요`}
             </p>
-            <div className="flex gap-4 text-[12px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[12px]">
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                 <span className="text-stone-300">마감임박 {urgentCount}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <MapPin size={11} className="text-rose-300" strokeWidth={2.5} />
+                <span className="text-stone-300">선택 지역 {selectedRegions.length}개</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <TrendingUp size={11} className="text-rose-300" strokeWidth={2.5} />

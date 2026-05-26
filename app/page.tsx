@@ -310,10 +310,16 @@ export default function App() {
   const filteredDaejeonCount = filtered.filter(n => n.region === '대전').length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-stone-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-stone-50/50 to-white overflow-x-hidden">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Pretendard:wght@400;500;600;700&display=swap');
-        body { font-family: 'Pretendard', -apple-system, sans-serif; }
+        html { overflow-y: scroll; }
+        body { 
+          font-family: 'Pretendard', -apple-system, sans-serif; 
+          touch-action: manipulation;
+          -webkit-overflow-scrolling: touch;
+          overflow-x: hidden;
+        }
         .font-serif { font-family: 'Noto Serif KR', serif; }
         .line-clamp-2 {
           display: -webkit-box;
@@ -325,8 +331,8 @@ export default function App() {
         * { -webkit-tap-highlight-color: transparent; }
       `}</style>
 
-      <header className="sticky top-0 z-40 bg-white border-b border-stone-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-5 py-3">
+      <header className="sticky top-0 z-40 bg-white border-b border-stone-100 overflow-x-hidden">
+        <div className="max-w-3xl mx-auto px-4 sm:px-5 py-3 w-full">
           <div className="flex items-center justify-between mb-3 gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">

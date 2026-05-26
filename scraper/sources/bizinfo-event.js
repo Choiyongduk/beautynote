@@ -65,12 +65,25 @@ function normalizeEvent(item) {
     ? `https://www.bizinfo.go.kr${url}`
     : url;
 
-  // 행사 분류 - 제목과 해시태그 둘 다 확인
-  const allText = `${title} ${hashtags} ${field}`.toLowerCase();
+  // 행사 분류 - 제목, 해시태그, 요약, 필드 모두 확인
+  const allText = `${title} ${hashtags} ${summary} ${field}`.toLowerCase();
+  
+  // 지원사업 우선 판정
+  const supportTerms = ['지원사업', '융자', '자금'];
+  const isSupport = supportTerms.some(term => allText.includes(term));
+  
+  // 명확한 전시 행사 키워드만 ("참가기업 모집" 제외)
+  const expoTerms = ['박람회', '전시회', '엑스포', '페어', '전시 부스'];
+  const isExpo = expoTerms.some(term => allText.includes(term));
+  
   let eventType = '교육·세미나';
-  if (/엑스포|expo|박람회|페어|fair|전시/i.test(allText)) eventType = '전시·박람회';
-  else if (/세미나|컨퍼런스|포럼|conference/i.test(allText)) eventType = '교육·세미나';
-  else if (/교육|강의|강좌/i.test(allText)) eventType = '교육·세미나';
+  if (isSupport) {
+    eventType = '지원사업';
+  } else if (isExpo) {
+    eventType = '전시·박람회';
+  } else if (/세미나|컨퍼런스|포럼|conference|교육|강의|강좌|워크숍/i.test(allText)) {
+    eventType = '교육·세미나';
+  }
 
   // 행사기간 (eventBeginEndDe) 또는 접수기간 (rcceptPd)
   const { startDate, endDate } = parsePeriod(item.eventBeginEndDe || item.rcceptPd || '');
@@ -135,12 +148,25 @@ function extractRegion(title, hashtags, venue) {
     '경북': ['경북', '경상북도'],
     '경남': ['경남', '경상남도'],
     '제주': ['제주', '제주도', '제주특별자치도'],
+    '전국': ['전국'],
   };
 
-  for (const [short, names] of Object.entries(regionMap)) {
-    if (names.some(name => text.includes(name))) return short;
+  const findRegion = (source) => {
+    const normalized = String(source || '');
+    for (const [short, names] of Object.entries(regionMap)) {
+      if (names.some(name => normalized.includes(name))) return short;
+    }
+    return null;
+  };
+
+  const bracketMatches = String(title || '').match(/\[([^\]]+)\]/g) || [];
+  for (const match of bracketMatches) {
+    const content = match.slice(1, -1);
+    const region = findRegion(content);
+    if (region) return region;
   }
-  return '전국';
+
+  return findRegion(text) || '전국';
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

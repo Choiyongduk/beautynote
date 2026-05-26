@@ -31,8 +31,8 @@ function isNoticeExpired(endDate) {
 function DeadlineBadge({ deadline }) {
   if (!deadline) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium tracking-tight bg-stone-100 text-stone-500">
-        <Clock size={11} strokeWidth={2.5} />
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-stone-100 text-stone-500">
+        <Clock size={12} strokeWidth={2.5} />
         상시
       </span>
     );
@@ -47,8 +47,8 @@ function DeadlineBadge({ deadline }) {
     label = '마감';
   }
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium tracking-tight ${style}`}>
-      <Clock size={11} strokeWidth={2.5} />
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${style}`}>
+      <Clock size={12} strokeWidth={2.5} />
       {label}
     </span>
   );
@@ -61,7 +61,7 @@ function CategoryPill({ category }) {
     '교육·세미나': 'bg-sky-50 text-sky-700 border-sky-100',
   };
   return (
-    <span className={`inline-block px-2.5 py-0.5 rounded-md text-[11px] font-medium border tracking-tight ${map[category] || 'bg-stone-50 text-stone-600 border-stone-200'}`}>
+    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium border ${map[category] || 'bg-stone-50 text-stone-600 border-stone-200'}`}>
       {category}
     </span>
   );
@@ -71,65 +71,65 @@ function NoticeCard({ notice, bookmarked, onToggleBookmark, onClick }) {
   return (
     <article
       onClick={onClick}
-      className="group relative bg-white border border-stone-200/80 rounded-2xl p-5 hover:border-stone-300 hover:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer"
+      className="relative bg-white border border-stone-200/80 rounded-2xl p-4 sm:p-5 cursor-pointer active:bg-stone-50"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-2 flex-wrap">
           <CategoryPill category={notice.category} />
           <DeadlineBadge deadline={notice.endDate} />
           {notice.region === '대전' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
               대전
             </span>
           )}
           {notice.relevance >= 50 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-rose-500 to-pink-500 text-white">
-              <Sparkles size={9} strokeWidth={2.5} />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-rose-500 to-pink-500 text-white">
+              <Sparkles size={12} strokeWidth={2.5} />
               추천
             </span>
           )}
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onToggleBookmark(notice.sourceId); }}
-          className="flex-shrink-0 p-1.5 -m-1.5 rounded-lg hover:bg-stone-50 transition-colors"
+          className="flex-shrink-0 p-2 rounded-lg active:bg-stone-100"
         >
           {bookmarked ? (
-            <BookmarkCheck size={18} className="text-rose-500" strokeWidth={2.2} fill="currentColor" />
+            <BookmarkCheck size={20} className="text-rose-500" strokeWidth={2.2} fill="currentColor" />
           ) : (
-            <Bookmark size={18} className="text-stone-400 group-hover:text-stone-600" strokeWidth={2} />
+            <Bookmark size={20} className="text-stone-400" strokeWidth={2} />
           )}
         </button>
       </div>
 
-      <h3 className="font-serif text-[17px] leading-snug text-stone-900 mb-2 tracking-tight">
+      <h3 className="font-serif text-base sm:text-lg leading-snug text-stone-900 mb-2 tracking-tight">
         {notice.title}
       </h3>
 
       {notice.summary && (
-        <p className="text-[13px] text-stone-600 leading-relaxed mb-4 line-clamp-2">
+        <p className="text-sm text-stone-600 leading-relaxed mb-4 line-clamp-2">
           {notice.summary}
         </p>
       )}
 
-      <div className="flex items-center gap-3 text-[11.5px] text-stone-500 mb-3 flex-wrap">
+      <div className="flex items-center gap-3 text-xs sm:text-sm text-stone-500 mb-3 flex-wrap">
         {notice.org && (
           <span className="inline-flex items-center gap-1">
-            <Building2 size={12} strokeWidth={2} />
+            <Building2 size={14} strokeWidth={2} />
             {notice.org}
           </span>
         )}
         <span className="inline-flex items-center gap-1">
-          <MapPin size={12} strokeWidth={2} />
+          <MapPin size={14} strokeWidth={2} />
           {notice.region || '전국'}
         </span>
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-stone-100">
-        <span className="text-[11px] text-stone-400">
+        <span className="text-xs text-stone-400">
           관련도 {notice.relevance}점
         </span>
         {notice.endDate && (
-          <span className="text-[11px] text-stone-400">
+          <span className="text-xs text-stone-400">
             ~{notice.endDate.slice(5).replace('-', '/')}
           </span>
         )}
@@ -143,51 +143,51 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
   const days = daysUntil(notice.endDate);
   return (
     <div
-      className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+      className="fixed inset-0 bg-stone-900/40 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto"
       >
-        <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-stone-100 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-stone-100 px-4 py-3 flex items-center justify-between">
           <CategoryPill category={notice.category} />
-          <button onClick={onClose} className="p-1.5 -m-1.5 rounded-lg hover:bg-stone-50">
+          <button onClick={onClose} className="p-2 rounded-lg active:bg-stone-100">
             <X size={20} strokeWidth={2} className="text-stone-500" />
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-3 flex-wrap">
             <DeadlineBadge deadline={notice.endDate} />
-            <span className="text-[11px] text-stone-500">관련도 {notice.relevance}점</span>
+            <span className="text-xs text-stone-500">관련도 {notice.relevance}점</span>
           </div>
 
-          <h2 className="font-serif text-2xl leading-tight text-stone-900 mb-4 tracking-tight">
+          <h2 className="font-serif text-xl sm:text-2xl leading-snug text-stone-900 mb-3 sm:mb-4 tracking-tight">
             {notice.title}
           </h2>
 
           {notice.summary && (
-            <p className="text-[14.5px] text-stone-700 leading-relaxed mb-6 whitespace-pre-line">
+            <p className="text-sm sm:text-base text-stone-700 leading-relaxed mb-5 sm:mb-6 whitespace-pre-line">
               {notice.summary}
             </p>
           )}
 
-          <div className="bg-stone-50 rounded-2xl p-5 space-y-3 mb-6">
+          <div className="bg-stone-50 rounded-lg p-4 space-y-2 mb-5 sm:mb-6">
             {notice.org && (
               <div className="flex justify-between items-start gap-3">
-                <span className="text-[12px] text-stone-500 flex-shrink-0">주관기관</span>
-                <span className="text-[13.5px] text-stone-900 font-medium text-right">{notice.org}</span>
+                <span className="text-xs text-stone-500 flex-shrink-0">주관기관</span>
+                <span className="text-sm text-stone-900 font-medium text-right">{notice.org}</span>
               </div>
             )}
             <div className="flex justify-between items-center">
-              <span className="text-[12px] text-stone-500">지역</span>
-              <span className="text-[13.5px] text-stone-900 font-medium">{notice.region}</span>
+              <span className="text-xs text-stone-500">지역</span>
+              <span className="text-sm text-stone-900 font-medium">{notice.region}</span>
             </div>
             {notice.endDate && (
               <div className="flex justify-between items-center">
-                <span className="text-[12px] text-stone-500">접수마감</span>
-                <span className="text-[13.5px] text-stone-900 font-medium">
+                <span className="text-xs text-stone-500">접수마감</span>
+                <span className="text-sm text-stone-900 font-medium">
                   {notice.endDate} {days > 0 && `(${days}일 남음)`}
                 </span>
               </div>
@@ -195,9 +195,9 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
           </div>
 
           {notice.matchedKeywords && notice.matchedKeywords.length > 0 && (
-            <div className="flex gap-2 mb-6 flex-wrap">
+            <div className="flex gap-2 mb-5 flex-wrap">
               {notice.matchedKeywords.map(tag => (
-                <span key={tag} className="px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-[11.5px] font-medium">
+                <span key={tag} className="px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-medium">
                   #{tag}
                 </span>
               ))}
@@ -207,22 +207,22 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
           <div className="flex gap-2">
             <button
               onClick={() => onToggleBookmark(notice.sourceId)}
-              className="flex-shrink-0 px-4 py-3 rounded-xl border border-stone-200 hover:border-stone-300 transition-colors"
+              className="flex-shrink-0 p-3 rounded-lg border border-stone-200 active:bg-stone-50"
             >
               {bookmarked ? (
-                <BookmarkCheck size={18} className="text-rose-500" fill="currentColor" />
+                <BookmarkCheck size={20} className="text-rose-500" fill="currentColor" />
               ) : (
-                <Bookmark size={18} className="text-stone-600" />
+                <Bookmark size={20} className="text-stone-600" />
               )}
             </button>
             <a
               href={notice.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-stone-900 text-white text-sm font-medium hover:bg-stone-800 transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-stone-900 text-white text-sm font-medium active:bg-stone-800"
             >
               원문 공고 보기
-              <ExternalLink size={15} strokeWidth={2.2} />
+              <ExternalLink size={16} strokeWidth={2} />
             </a>
           </div>
         </div>
@@ -300,14 +300,14 @@ export default function App() {
     return list;
   }, [notices, category, selectedRegions, sort, search, showBookmarksOnly, showClosedNotices, bookmarks]);
 
-  const urgentCount = notices.filter(n => {
+  const urgentCount = filtered.filter(n => {
     const d = daysUntil(n.endDate);
     return d >= 0 && d <= 7;
   }).length;
 
   const closedCount = notices.filter(n => isNoticeExpired(n.endDate)).length;
-  const activeNoticesCount = notices.filter(n => !isNoticeExpired(n.endDate)).length;
-  const activeDaejeonCount = notices.filter(n => !isNoticeExpired(n.endDate) && n.region === '대전').length;
+  const filteredNoticesCount = filtered.length;
+  const filteredDaejeonCount = filtered.filter(n => n.region === '대전').length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-stone-50/50 to-white">
@@ -322,28 +322,29 @@ export default function App() {
           overflow: hidden;
         }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
+        * { -webkit-tap-highlight-color: transparent; }
       `}</style>
 
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-stone-100">
-        <div className="max-w-3xl mx-auto px-5 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
+      <header className="sticky top-0 z-40 bg-white border-b border-stone-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-5 py-3">
+          <div className="flex items-center justify-between mb-3 gap-2">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center">
-                  <Sparkles size={14} className="text-white" strokeWidth={2.5} />
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-rose-400 to-pink-500 flex-shrink-0 flex items-center justify-center">
+                  <Sparkles size={13} className="text-white" strokeWidth={2.5} />
                 </div>
-                <h1 className="font-serif text-xl text-stone-900 tracking-tight">
-                  뷰티노트 <span className="text-rose-500">·</span> <span className="text-[14px] text-stone-500 font-sans">대전</span>
+                <h1 className="font-serif text-lg sm:text-xl text-stone-900 tracking-tight">
+                  뷰티노트 <span className="text-rose-500">·</span> <span className="text-xs sm:text-sm text-stone-500 font-sans">대전</span>
                 </h1>
               </div>
-              <p className="text-[11.5px] text-stone-500 ml-9">
-                매일 자동 업데이트 · {activeNoticesCount}건 진행중
+              <p className="text-xs text-stone-500 ml-8">
+                {filteredNoticesCount}건 진행중
               </p>
             </div>
-            <button className="relative p-2 rounded-xl hover:bg-stone-50 transition-colors">
+            <button className="flex-shrink-0 p-2 rounded-lg active:bg-stone-100">
               <Bell size={20} className="text-stone-700" strokeWidth={2} />
               {urgentCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center">
                   {urgentCount}
                 </span>
               )}
@@ -351,58 +352,58 @@ export default function App() {
           </div>
 
           <div className="relative mb-3">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" strokeWidth={2} />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" strokeWidth={2} />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="공고·기관·키워드 검색"
-              className="w-full pl-10 pr-4 py-2.5 bg-stone-100/80 border-0 rounded-xl text-[13.5px] placeholder:text-stone-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-stone-200 transition-all"
+              placeholder="검색"
+              className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border-0 rounded-lg text-sm placeholder:text-stone-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-stone-300"
             />
           </div>
 
-          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+          <div className="flex gap-1 overflow-x-auto pb-1 -mx-2 px-2 scrollbar-hide">
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-[12.5px] font-medium transition-all ${
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${
                   category === cat
                     ? 'bg-stone-900 text-white'
-                    : 'bg-white border border-stone-200 text-stone-600 hover:border-stone-300'
+                    : 'bg-white border border-stone-200 text-stone-600'
                 }`}
               >
                 {cat}
               </button>
             ))}
-            <div className="w-px bg-stone-200 mx-1" />
+            <div className="w-px bg-stone-200 mx-0.5" />
             <button
               onClick={() => setShowClosedNotices(v => !v)}
-              className={`flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[12.5px] font-medium transition-all ${
+              className={`flex-shrink-0 inline-flex items-center gap-0.5 px-2.5 py-1.5 rounded-full text-xs font-medium ${
                 showClosedNotices
                   ? 'bg-stone-500 text-white'
                   : 'bg-white border border-stone-200 text-stone-600'
               }`}
             >
-              <Clock size={12} strokeWidth={2} />
-              {showClosedNotices ? `마감 ${closedCount}` : '마감'}
+              <Clock size={11} strokeWidth={2} />
+              {showClosedNotices ? `${closedCount}` : '마감'}
             </button>
             {!showClosedNotices && (
               <button
                 onClick={() => setShowBookmarksOnly(v => !v)}
-                className={`flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[12.5px] font-medium transition-all ${
+                className={`flex-shrink-0 inline-flex items-center gap-0.5 px-2.5 py-1.5 rounded-full text-xs font-medium ${
                   showBookmarksOnly
                     ? 'bg-rose-500 text-white'
                     : 'bg-white border border-stone-200 text-stone-600'
                 }`}
               >
-                <Bookmark size={12} fill={showBookmarksOnly ? 'currentColor' : 'none'} strokeWidth={2.2} />
+                <Bookmark size={11} fill={showBookmarksOnly ? 'currentColor' : 'none'} strokeWidth={2.2} />
                 저장
               </button>
             )}
           </div>
 
-          <div className="mt-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2">
-            <div className="flex gap-2 min-w-max">
+          <div className="mt-2 overflow-x-auto scrollbar-hide -mx-4 sm:-mx-5 px-4 sm:px-5 pb-1.5">
+            <div className="flex gap-1.5 min-w-max">
               {REGIONS.map(region => {
                 const isSelected = selectedRegions.includes(region);
                 return (
@@ -417,10 +418,10 @@ export default function App() {
                         return [...prev, region];
                       });
                     }}
-                    className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-[12.5px] font-medium transition-all whitespace-nowrap ${
+                    className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       isSelected
                         ? 'bg-rose-500 text-white border border-rose-500'
-                        : 'bg-white border border-stone-200 text-stone-600 hover:border-stone-300'
+                        : 'bg-white border border-stone-200 text-stone-600'
                     }`}
                   >
                     {region}
@@ -439,7 +440,7 @@ export default function App() {
           <div className="relative">
             <p className="text-[11px] text-stone-400 mb-1 tracking-wider uppercase">Today</p>
             <p className="font-serif text-2xl mb-3 tracking-tight">
-              {loading ? '로딩 중...' : `${activeNoticesCount}건의 공고가 진행중이에요`}
+              {loading ? '로딩 중...' : `${filteredNoticesCount}건의 공고가 진행중이에요`}
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[12px]">
               <div className="flex items-center gap-1.5">
@@ -453,7 +454,7 @@ export default function App() {
               <div className="flex items-center gap-1.5">
                 <TrendingUp size={11} className="text-rose-300" strokeWidth={2.5} />
                 <span className="text-stone-300">
-                  대전 {activeDaejeonCount}건
+                  대전 {filteredDaejeonCount}건
                 </span>
               </div>
             </div>
@@ -484,15 +485,15 @@ export default function App() {
 
       <main className="max-w-3xl mx-auto px-5 pb-20">
         {loading ? (
-          <div className="text-center py-20 text-stone-400 text-sm">
-            데이터 불러오는 중...
+          <div className="text-center py-16 text-stone-400 text-sm">
+            로딩 중...
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-stone-400 text-sm">
+          <div className="text-center py-16 text-stone-400 text-sm">
             조건에 맞는 공고가 없어요
           </div>
         ) : (
-          <div className="grid gap-3">
+          <div className="space-y-3">
             {filtered.map(notice => (
               <NoticeCard
                 key={notice.sourceId}
@@ -513,8 +514,8 @@ export default function App() {
         onToggleBookmark={toggleBookmark}
       />
 
-      <footer className="text-center py-8 text-[11px] text-stone-400 tracking-tight">
-        뷰티노트 · 와이프 전용 큐레이션
+      <footer className="text-center py-6 text-xs text-stone-400 tracking-tight">
+        뷰티노트 · 와이프 전용
       </footer>
     </div>
   );

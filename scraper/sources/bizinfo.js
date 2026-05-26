@@ -76,13 +76,14 @@ function normalizeNotice(item) {
   // 접수기간 파싱
   const { startDate, endDate } = parsePeriod(item.reqstBeginEndDe || item.rcceptPd || '');
 
-  // 지역 추출: 제목 + 해시태그 + 기관명 모두 확인
-  const region = extractRegion(title, hashtags, org);
+  // 지역 추출: 제목 + 해시태그 + 기관명 + 요약 모두 확인
+  const region = extractRegion(title, hashtags, org, summary);
+  const category = classifyBizinfoCategory(title, hashtags, field, summary);
 
   return {
     source: 'bizinfo',
     sourceId: String(item.pblancId || item.seq || Math.random()),
-    category: '지원사업',
+    category,
     title: title.trim(),
     summary: summary.slice(0, 300),
     org,
@@ -116,8 +117,30 @@ function toISODate(s) {
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
 }
 
-function extractRegion(title, hashtags, org) {
-  const text = `${title} ${hashtags} ${org}`;
+function classifyBizinfoCategory(title, hashtags, field, summary) {
+  const allText = `${title} ${hashtags} ${field} ${summary}`.toLowerCase();
+  
+  // 지원사업 우선 판정
+  const supportTerms = ['지원사업', '융자', '자금'];
+  const isSupport = supportTerms.some(term => allText.includes(term));
+  
+  // 명확한 전시 행사 키워드만 ("참가기업 모집" 제외)
+  const expoTerms = ['박람회', '전시회', '엑스포', '페어', '전시 부스'];
+  const isExpo = expoTerms.some(term => allText.includes(term));
+  
+  // 교육 키워드
+  const eduTerms = ['세미나', '컨퍼런스', '포럼', 'conference', '교육', '강의', '강좌', '워크숍'];
+  const isEdu = eduTerms.some(term => allText.includes(term));
+  
+  // 판정 로직: 지원사업 키워드가 있으면 지원사업으로 우선 분류
+  if (isSupport) return '지원사업';
+  if (isExpo) return '전시·박람회';
+  if (isEdu) return '교육·세미나';
+  return '지원사업';
+}
+
+function extractRegion(title, hashtags, org, summary) {
+  const text = `${title} ${hashtags} ${org} ${summary}`;
   const regionMap = {
     '대전': ['대전', '대전광역시'],
     '서울': ['서울', '서울특별시'],
@@ -136,12 +159,25 @@ function extractRegion(title, hashtags, org) {
     '경북': ['경북', '경상북도'],
     '경남': ['경남', '경상남도'],
     '제주': ['제주', '제주도', '제주특별자치도'],
+    '전국': ['전국'],
   };
 
-  for (const [short, names] of Object.entries(regionMap)) {
-    if (names.some(name => text.includes(name))) return short;
+  const findRegion = (source) => {
+    const normalized = String(source || '');
+    for (const [short, names] of Object.entries(regionMap)) {
+      if (names.some(name => normalized.includes(name))) return short;
+    }
+    return null;
+  };
+
+  const bracketMatches = String(title || '').match(/\[([^\]]+)\]/g) || [];
+  for (const match of bracketMatches) {
+    const content = match.slice(1, -1);
+    const region = findRegion(content);
+    if (region) return region;
   }
-  return '전국';
+
+  return findRegion(text) || '전국';
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

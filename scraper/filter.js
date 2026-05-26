@@ -24,6 +24,7 @@ const EXCLUDE_KEYWORDS = [
   '연구개발', 'R&D', '특허출원',
   '청년농업인', '귀농', '귀촌',
   '항공우주', '방산',
+  '해양수산', '수산', '해양',
 ];
 
 export function scoreNotice(notice) {
@@ -63,12 +64,10 @@ export function filterAndRank(notices, { targetRegion = '대전', dedupe = true 
 
   scored = scored.filter(n => {
     if (n.relevance === 0) return false;
-    // 대상 지역(대전) 공고는 점수 낮아도 통과
-    if (n.region === targetRegion) return n.relevance >= 5;
-    // 전국 공고는 점수 높은 것만
-    if (n.region === '전국') return n.relevance >= 15;
-    // 다른 지역은 제외
-    return false;
+    const region = n.region || '전국';
+    if (region === targetRegion) return n.relevance >= 5;
+    if (region === '전국') return n.relevance >= 15;
+    return n.relevance >= 15;
   });
 
   if (dedupe) {

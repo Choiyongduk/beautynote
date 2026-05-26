@@ -1,15 +1,25 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Bell, Bookmark, BookmarkCheck, MapPin, Building2, Sparkles, ExternalLink, Clock, TrendingUp, X } from 'lucide-react';
+import { Search, Bookmark, BookmarkCheck, MapPin, Building2, Sparkles, ExternalLink, Clock, TrendingUp, X } from 'lucide-react';
 
 const CATEGORIES = ['전체', '지원사업', '전시·박람회', '교육·세미나'];
 const REGIONS = ['전국', '서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+
 const SORT_OPTIONS = [
   { key: 'deadline', label: '마감임박순' },
   { key: 'relevance', label: '관련도순' },
   { key: 'posted', label: '최신순' },
 ];
+
+function stripUrls(text) {
+  if (!text) return text;
+  return text
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\s*@\s*(?=\s|$)/g, '')
+    .trim();
+}
 
 function daysUntil(dateStr) {
   if (!dateStr) return 999;
@@ -107,7 +117,7 @@ function NoticeCard({ notice, bookmarked, onToggleBookmark, onClick }) {
 
       {notice.summary && (
         <p className="text-sm text-stone-600 leading-relaxed mb-4 line-clamp-2">
-          {notice.summary}
+          {stripUrls(notice.summary)}
         </p>
       )}
 
@@ -169,7 +179,7 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
 
           {notice.summary && (
             <p className="text-sm sm:text-base text-stone-700 leading-relaxed mb-5 sm:mb-6 whitespace-pre-line break-words">
-              {notice.summary}
+              {stripUrls(notice.summary)}
             </p>
           )}
 
@@ -235,7 +245,7 @@ export default function App() {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('전체');
-  const [selectedRegions, setSelectedRegions] = useState(['대전', '전국']);
+  const [selectedRegion, setSelectedRegion] = useState('대전');
   const [sort, setSort] = useState('deadline');
   const [search, setSearch] = useState('');
   const [bookmarks, setBookmarks] = useState(new Set());
@@ -278,15 +288,15 @@ export default function App() {
     }
     
     if (category !== '전체') list = list.filter(n => n.category === category);
-    if (selectedRegions.length > 0) {
-      list = list.filter(n => selectedRegions.includes(n.region || '전국'));
+    if (selectedRegion) {
+      list = list.filter(n => (n.region || '전국') === selectedRegion);
     }
     if (showBookmarksOnly) list = list.filter(n => bookmarks.has(n.sourceId));
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(n =>
         (n.title || '').toLowerCase().includes(q) ||
-        (n.summary || '').toLowerCase().includes(q) ||
+        stripUrls(n.summary || '').toLowerCase().includes(q) ||
         (n.matchedKeywords || []).some(t => t.toLowerCase().includes(q))
       );
     }
@@ -298,7 +308,7 @@ export default function App() {
     else if (sort === 'relevance') list.sort((a, b) => b.relevance - a.relevance);
     else if (sort === 'posted') list.sort((a, b) => (b.posted || '').localeCompare(a.posted || ''));
     return list;
-  }, [notices, category, selectedRegions, sort, search, showBookmarksOnly, showClosedNotices, bookmarks]);
+  }, [notices, category, selectedRegion, sort, search, showBookmarksOnly, showClosedNotices, bookmarks]);
 
   const urgentCount = filtered.filter(n => {
     const d = daysUntil(n.endDate);
@@ -351,14 +361,6 @@ export default function App() {
                 {filteredNoticesCount}건 진행중
               </p>
             </div>
-            <button className="relative flex-shrink-0 p-2 rounded-lg active:bg-stone-100">
-              <Bell size={20} className="text-stone-700" strokeWidth={2} />
-              {urgentCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center">
-                  {urgentCount}
-                </span>
-              )}
-            </button>
           </div>
 
           <div className="relative mb-3">
@@ -415,19 +417,12 @@ export default function App() {
           <div className="mt-2 overflow-x-auto scrollbar-hide -mx-4 sm:-mx-5 px-4 sm:px-5 pb-1.5">
             <div className="flex gap-1.5 min-w-max">
               {REGIONS.map(region => {
-                const isSelected = selectedRegions.includes(region);
+                const isSelected = selectedRegion === region;
                 return (
                   <button
                     key={region}
                     type="button"
-                    onClick={() => {
-                      setSelectedRegions(prev => {
-                        if (prev.includes(region)) {
-                          return prev.filter(r => r !== region);
-                        }
-                        return [...prev, region];
-                      });
-                    }}
+                    onClick={() => setSelectedRegion(region)}
                     className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       isSelected
                         ? 'bg-rose-500 text-white border border-rose-500'
@@ -459,7 +454,7 @@ export default function App() {
               </div>
               <div className="flex items-center gap-1.5">
                 <MapPin size={11} className="text-rose-300" strokeWidth={2.5} />
-                <span className="text-stone-300">선택 지역 {selectedRegions.length}개</span>
+                <span className="text-stone-300">선택 지역 {selectedRegion}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <TrendingUp size={11} className="text-rose-300" strokeWidth={2.5} />

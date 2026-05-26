@@ -143,12 +143,12 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
   const days = daysUntil(notice.endDate);
   return (
     <div
-      className="fixed inset-0 bg-stone-900/40 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+      className="fixed inset-0 bg-stone-900/40 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6 overflow-x-hidden"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto overflow-x-hidden"
       >
         <div className="sticky top-0 bg-white border-b border-stone-100 px-4 py-3 flex items-center justify-between">
           <CategoryPill category={notice.category} />
@@ -157,35 +157,35 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
           </button>
         </div>
 
-        <div className="p-4 sm:p-6">
+        <div className="p-4 sm:p-6 break-words">
           <div className="flex items-center gap-2 mb-3 flex-wrap">
             <DeadlineBadge deadline={notice.endDate} />
             <span className="text-xs text-stone-500">관련도 {notice.relevance}점</span>
           </div>
 
-          <h2 className="font-serif text-xl sm:text-2xl leading-snug text-stone-900 mb-3 sm:mb-4 tracking-tight">
+          <h2 className="font-serif text-xl sm:text-2xl leading-snug text-stone-900 mb-3 sm:mb-4 tracking-tight break-words">
             {notice.title}
           </h2>
 
           {notice.summary && (
-            <p className="text-sm sm:text-base text-stone-700 leading-relaxed mb-5 sm:mb-6 whitespace-pre-line">
+            <p className="text-sm sm:text-base text-stone-700 leading-relaxed mb-5 sm:mb-6 whitespace-pre-line break-words">
               {notice.summary}
             </p>
           )}
 
-          <div className="bg-stone-50 rounded-lg p-4 space-y-2 mb-5 sm:mb-6">
+          <div className="bg-stone-50 rounded-lg p-4 space-y-2 mb-5 sm:mb-6 break-words">
             {notice.org && (
-              <div className="flex justify-between items-start gap-3">
+              <div className="flex justify-between items-start gap-3 break-words">
                 <span className="text-xs text-stone-500 flex-shrink-0">주관기관</span>
-                <span className="text-sm text-stone-900 font-medium text-right">{notice.org}</span>
+                <span className="text-sm text-stone-900 font-medium text-right break-words">{notice.org}</span>
               </div>
             )}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center break-words">
               <span className="text-xs text-stone-500">지역</span>
               <span className="text-sm text-stone-900 font-medium">{notice.region}</span>
             </div>
             {notice.endDate && (
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center break-words">
                 <span className="text-xs text-stone-500">접수마감</span>
                 <span className="text-sm text-stone-900 font-medium">
                   {notice.endDate} {days > 0 && `(${days}일 남음)`}
@@ -219,10 +219,10 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
               href={notice.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-stone-900 text-white text-sm font-medium active:bg-stone-800"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-stone-900 text-white text-sm font-medium active:bg-stone-800 min-w-0 break-words"
             >
-              원문 공고 보기
-              <ExternalLink size={16} strokeWidth={2} />
+              <span>원문 공고 보기</span>
+              <ExternalLink size={16} strokeWidth={2} className="flex-shrink-0" />
             </a>
           </div>
         </div>
@@ -329,6 +329,10 @@ export default function App() {
         }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         * { -webkit-tap-highlight-color: transparent; }
+        a { 
+          word-break: break-all; 
+          overflow-wrap: break-word;
+        }
       `}</style>
 
       <header className="sticky top-0 z-40 bg-white border-b border-stone-100 overflow-x-hidden">
@@ -347,10 +351,10 @@ export default function App() {
                 {filteredNoticesCount}건 진행중
               </p>
             </div>
-            <button className="flex-shrink-0 p-2 rounded-lg active:bg-stone-100">
+            <button className="relative flex-shrink-0 p-2 rounded-lg active:bg-stone-100">
               <Bell size={20} className="text-stone-700" strokeWidth={2} />
               {urgentCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center">
                   {urgentCount}
                 </span>
               )}

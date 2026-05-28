@@ -1,11 +1,11 @@
 {
-  "name": "뷰티노트",
-  "short_name": "뷰티노트",
+  "name": "HSSUP",
+  "short_name": "HSSUP",
   "lang": "ko",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#fb7185",
+  "background_color": "#FAF8F5",
+  "theme_color": "#E8510A",
   "icons": [
     {
       "src": "/icon-192.png",

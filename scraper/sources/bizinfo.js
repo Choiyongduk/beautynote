@@ -4,6 +4,7 @@
 import fetch from 'node-fetch';
 import { XMLParser } from 'fast-xml-parser';
 import 'dotenv/config';
+import { cleanTitle, cleanSummary } from '../sanitize.js';
 
 const API_URL = 'https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do';
 const API_KEY = process.env.BIZINFO_API_KEY || 'QP6yn2';
@@ -55,8 +56,8 @@ function normalizeNotice(item) {
   if (!item) return null;
 
   // 실제 비즈인포 지원사업 API 필드명 매핑
-  const title = item.pblancNm || item.title || '';
-  const summary = (item.bsnsSumryCn || item.description || '').replace(/<[^>]+>/g, '').trim();
+  const title = cleanTitle(item.pblancNm || item.title || '');
+  const summary = cleanSummary(item.bsnsSumryCn || item.description || '');
   const org = item.jrsdInsttNm || item.refrncNm || '';
   const executor = item.excInsttNm || '';
   const field = item.pldirSportRealmLclasCodeNm || '';
@@ -84,7 +85,7 @@ function normalizeNotice(item) {
     source: 'bizinfo',
     sourceId: String(item.pblancId || item.seq || Math.random()),
     category,
-    title: title.trim(),
+    title,
     summary: summary.slice(0, 300),
     org,
     executor,

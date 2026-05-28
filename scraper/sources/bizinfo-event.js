@@ -4,6 +4,7 @@
 import fetch from 'node-fetch';
 import { XMLParser } from 'fast-xml-parser';
 import 'dotenv/config';
+import { cleanTitle, cleanSummary } from '../sanitize.js';
 
 const API_URL = 'https://www.bizinfo.go.kr/uss/rss/bizinfoEventApi.do';
 const API_KEY = process.env.BIZINFO_EVENT_API_KEY || process.env.BIZINFO_API_KEY || 'QP6yn2';
@@ -54,8 +55,8 @@ function normalizeEvent(item) {
   if (!item) return null;
 
   // 실제 비즈인포 행사 API 필드명 매핑
-  const title = item.nttNm || item.title || '';
-  const summary = (item.nttCn || item.description || '').replace(/<[^>]+>/g, '').trim();
+  const title = cleanTitle(item.nttNm || item.title || '');
+  const summary = cleanSummary(item.nttCn || item.description || '');
   const org = item.originEngnNm || item.hostInsttNm || '';
   const venue = item.areaNm || item.eventPlaceNm || '';
   const field = item.pldirSportRealmLclasCodeNm || '';
@@ -95,7 +96,7 @@ function normalizeEvent(item) {
     source: 'bizinfo-event',
     sourceId: String(item.eventInfoId || item.seq || Math.random()),
     category: eventType,
-    title: title.trim(),
+    title,
     summary: summary.slice(0, 300),
     org,
     executor: org,

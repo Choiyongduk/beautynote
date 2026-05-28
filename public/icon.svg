@@ -1,18 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fb7185"/>
-      <stop offset="100%" stop-color="#ec4899"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="url(#g)"/>
-  <g transform="translate(88 88) scale(14)">
-    <path fill="#fff" d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+  <rect width="512" height="512" rx="112" fill="#FAF8F5"/>
+  <g fill="#E8510A">
+    <rect x="146" y="100" width="42" height="312"/>
+    <rect x="324" y="100" width="42" height="312"/>
+    <rect x="146" y="240" width="220" height="32"/>
+    <rect x="126" y="100" width="82" height="14"/>
+    <rect x="126" y="398" width="82" height="14"/>
+    <rect x="304" y="100" width="82" height="14"/>
+    <rect x="304" y="398" width="82" height="14"/>
   </g>
-  <g fill="#fff">
-    <rect x="395" y="105" width="14" height="42" rx="3"/>
-    <rect x="381" y="119" width="42" height="14" rx="3"/>
-    <rect x="108" y="370" width="11" height="34" rx="3"/>
-    <rect x="97" y="381" width="34" height="11" rx="3"/>
-  </g>
+  <path fill="#0A0A0A" d="M418 70 L426 110 L466 118 L426 126 L418 166 L410 126 L370 118 L410 110 Z"/>
+  <path fill="#0A0A0A" d="M104 384 L110 412 L138 418 L110 424 L104 452 L98 424 L70 418 L98 412 Z"/>
 </svg>

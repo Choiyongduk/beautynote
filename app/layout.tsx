@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "뷰티노트",
-  description: "대전 뷰티 사업자용 정부지원·박람회·세미나 공고",
+  title: "HSSUP",
+  description: "히썹 노트 — 대전 뷰티 사업자용 정부지원·박람회·세미나 공고",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fb7185",
+  themeColor: "#E8510A",
 };
 
 export default function RootLayout({

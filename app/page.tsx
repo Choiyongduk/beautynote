@@ -12,11 +12,32 @@ const SORT_OPTIONS = [
   { key: 'posted', label: '최신순' },
 ];
 
+const NAMED_ENTITIES = {
+  nbsp: ' ', lt: '<', gt: '>', amp: '&', quot: '"', apos: "'",
+  ndash: '–', mdash: '—', hellip: '…',
+  lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”',
+  middot: '·', copy: '©', reg: '®', trade: '™',
+  laquo: '«', raquo: '»',
+};
+
 function stripUrls(text) {
   if (!text) return text;
   return text
-    .replace(/https?:\/\/\S+/g, '')
-    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => {
+      const code = parseInt(h, 16);
+      return Number.isFinite(code) ? String.fromCodePoint(code) : '';
+    })
+    .replace(/&#(\d+);/g, (_, n) => {
+      const code = parseInt(n, 10);
+      return Number.isFinite(code) ? String.fromCodePoint(code) : '';
+    })
+    .replace(/&([a-zA-Z]+);/g, (m, name) => {
+      const v = NAMED_ENTITIES[name.toLowerCase()];
+      return v !== undefined ? v : m;
+    })
+    .replace(/https?:\/\/\S+/gi, '')
+    .replace(/[ \t ]{2,}/g, ' ')
     .replace(/\s*@\s*(?=\s|$)/g, '')
     .trim();
 }
@@ -66,7 +87,7 @@ function DeadlineBadge({ deadline }) {
 
 function CategoryPill({ category }) {
   const map = {
-    '지원사업': 'bg-rose-50 text-rose-700 border-rose-100',
+    '지원사업': 'bg-orange-50 text-orange-700 border-orange-100',
     '전시·박람회': 'bg-violet-50 text-violet-700 border-violet-100',
     '교육·세미나': 'bg-sky-50 text-sky-700 border-sky-100',
   };
@@ -88,12 +109,12 @@ function NoticeCard({ notice, bookmarked, onToggleBookmark, onClick }) {
           <CategoryPill category={notice.category} />
           <DeadlineBadge deadline={notice.endDate} />
           {notice.region === '대전' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
               대전
             </span>
           )}
           {notice.relevance >= 50 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-rose-500 to-pink-500 text-white">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-orange-600 to-orange-500 text-white">
               <Sparkles size={12} strokeWidth={2.5} />
               추천
             </span>
@@ -104,7 +125,7 @@ function NoticeCard({ notice, bookmarked, onToggleBookmark, onClick }) {
           className="flex-shrink-0 p-2 rounded-lg active:bg-stone-100"
         >
           {bookmarked ? (
-            <BookmarkCheck size={20} className="text-rose-500" strokeWidth={2.2} fill="currentColor" />
+            <BookmarkCheck size={20} className="text-orange-600" strokeWidth={2.2} fill="currentColor" />
           ) : (
             <Bookmark size={20} className="text-stone-400" strokeWidth={2} />
           )}
@@ -207,7 +228,7 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
           {notice.matchedKeywords && notice.matchedKeywords.length > 0 && (
             <div className="flex gap-2 mb-5 flex-wrap">
               {notice.matchedKeywords.map(tag => (
-                <span key={tag} className="px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-medium">
+                <span key={tag} className="px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-medium">
                   #{tag}
                 </span>
               ))}
@@ -220,7 +241,7 @@ function DetailModal({ notice, onClose, bookmarked, onToggleBookmark }) {
               className="flex-shrink-0 p-3 rounded-lg border border-stone-200 active:bg-stone-50"
             >
               {bookmarked ? (
-                <BookmarkCheck size={20} className="text-rose-500" fill="currentColor" />
+                <BookmarkCheck size={20} className="text-orange-600" fill="currentColor" />
               ) : (
                 <Bookmark size={20} className="text-stone-600" />
               )}
@@ -317,20 +338,22 @@ export default function App() {
 
   const closedCount = notices.filter(n => isNoticeExpired(n.endDate)).length;
   const filteredNoticesCount = filtered.length;
-  const filteredDaejeonCount = filtered.filter(n => n.region === '대전').length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-stone-50/50 to-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] overflow-x-hidden">
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Pretendard:wght@400;500;600;700&display=swap');
-        html { overflow-y: scroll; }
-        body { 
-          font-family: 'Pretendard', -apple-system, sans-serif; 
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500;600;700&family=Pretendard:wght@400;500;600;700&display=swap');
+        html { overflow-y: scroll; background-color: #FAF8F5; }
+        body {
+          font-family: 'Pretendard', -apple-system, sans-serif;
+          background-color: #FAF8F5;
+          color: #222222;
           touch-action: manipulation;
           -webkit-overflow-scrolling: touch;
           overflow-x: hidden;
         }
         .font-serif { font-family: 'Noto Serif KR', serif; }
+        .font-display { font-family: 'Cormorant Garamond', 'Noto Serif KR', serif; font-weight: 500; }
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;
@@ -345,20 +368,20 @@ export default function App() {
         }
       `}</style>
 
-      <header className="sticky top-0 z-40 bg-white border-b border-stone-100 overflow-x-hidden">
+      <header className="sticky top-0 z-40 bg-[#FAF8F5]/90 backdrop-blur border-b border-stone-200/60 overflow-x-hidden">
         <div className="max-w-3xl mx-auto px-4 sm:px-5 py-3 w-full">
           <div className="flex items-center justify-between mb-3 gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-rose-400 to-pink-500 flex-shrink-0 flex items-center justify-center">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-[#FF6B2B] to-[#E8510A] flex-shrink-0 flex items-center justify-center">
                   <Sparkles size={13} className="text-white" strokeWidth={2.5} />
                 </div>
-                <h1 className="font-serif text-lg sm:text-xl text-stone-900 tracking-tight">
-                  뷰티노트 <span className="text-rose-500">·</span> <span className="text-xs sm:text-sm text-stone-500 font-sans">대전</span>
+                <h1 className="font-display text-xl sm:text-2xl text-[#0A0A0A] tracking-[0.22em] leading-none">
+                  HSSUP
                 </h1>
               </div>
-              <p className="text-xs text-stone-500 ml-8">
-                {filteredNoticesCount}건 진행중
+              <p className="text-[11px] sm:text-xs text-stone-500 ml-8 tracking-wide">
+                히썹 노트 · 대전 · {filteredNoticesCount}건 진행중
               </p>
             </div>
           </div>
@@ -404,7 +427,7 @@ export default function App() {
                 onClick={() => setShowBookmarksOnly(v => !v)}
                 className={`flex-shrink-0 inline-flex items-center gap-0.5 px-2.5 py-1.5 rounded-full text-xs font-medium ${
                   showBookmarksOnly
-                    ? 'bg-rose-500 text-white'
+                    ? 'bg-[#E8510A] text-white'
                     : 'bg-white border border-stone-200 text-stone-600'
                 }`}
               >
@@ -425,7 +448,7 @@ export default function App() {
                     onClick={() => setSelectedRegion(region)}
                     className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       isSelected
-                        ? 'bg-rose-500 text-white border border-rose-500'
+                        ? 'bg-[#E8510A] text-white border border-[#E8510A]'
                         : 'bg-white border border-stone-200 text-stone-600'
                     }`}
                   >
@@ -439,9 +462,9 @@ export default function App() {
       </header>
 
       <div className="max-w-3xl mx-auto px-5 pt-5">
-        <div className="bg-gradient-to-br from-stone-900 to-stone-800 rounded-2xl p-5 text-white relative overflow-hidden">
-          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-rose-500/20 blur-2xl" />
-          <div className="absolute -right-2 -bottom-6 w-24 h-24 rounded-full bg-pink-400/15 blur-xl" />
+        <div className="bg-gradient-to-br from-[#0A0A0A] to-[#222222] rounded-2xl p-5 text-white relative overflow-hidden">
+          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#E8510A]/30 blur-2xl" />
+          <div className="absolute -right-2 -bottom-6 w-24 h-24 rounded-full bg-[#FF6B2B]/20 blur-xl" />
           <div className="relative">
             <p className="text-[11px] text-stone-400 mb-1 tracking-wider uppercase">Today</p>
             <p className="font-serif text-2xl mb-3 tracking-tight">
@@ -453,13 +476,9 @@ export default function App() {
                 <span className="text-stone-300">마감임박 {urgentCount}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <MapPin size={11} className="text-rose-300" strokeWidth={2.5} />
-                <span className="text-stone-300">선택 지역 {selectedRegion}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <TrendingUp size={11} className="text-rose-300" strokeWidth={2.5} />
+                <MapPin size={11} className="text-[#FF6B2B]" strokeWidth={2.5} />
                 <span className="text-stone-300">
-                  대전 {filteredDaejeonCount}건
+                  {selectedRegion} {filteredNoticesCount}건
                 </span>
               </div>
             </div>

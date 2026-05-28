@@ -5,6 +5,7 @@
 
 import fetch from 'node-fetch';
 import 'dotenv/config';
+import { cleanTitle, cleanSummary } from '../sanitize.js';
 
 const API_URL = 'https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01';
 const API_KEY = process.env.DATAGO_API_KEY;
@@ -90,8 +91,8 @@ function normalizeKStartup(item) {
     source: 'kstartup',
     sourceId: String(item.pbanc_sn || item.id || Math.random()),
     category: '지원사업',
-    title: (item.biz_pbanc_nm || item.title || '').trim(),
-    summary: (item.pbanc_ctnt || item.description || '').trim().slice(0, 300),
+    title: cleanTitle(item.biz_pbanc_nm || item.title || ''),
+    summary: cleanSummary(item.pbanc_ctnt || item.description || '').slice(0, 300),
     org: item.pbanc_ntrp_nm || item.supt_biz_clsfc || '',
     executor: item.biz_prch_dprt_nm || '',
     region: item.supt_regin || '전국',
